@@ -31,9 +31,14 @@ export const LoginPage = () => {
         navigate('/employee/dashboard');
       }
     } catch (err) {
-      const msg = err.response?.data?.message || 
-                  err.response?.data?.errors?.login?.[0] || 
-                  'Failed to sign in. Please verify your credentials.';
+      let msg = err.response?.data?.message || err.response?.data?.errors?.login?.[0];
+      if (!msg) {
+        if (!err.response || err.message === 'Network Error' || err.code === 'ERR_NETWORK') {
+          msg = `Cannot reach backend API at ${API_BASE_URL}. Ensure your backend server is running and accessible over HTTPS.`;
+        } else {
+          msg = 'Failed to sign in. Please verify your credentials.';
+        }
+      }
       setError(msg);
     } finally {
       setLoading(false);
